@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 27-11-2021 a las 09:57:25
+-- Tiempo de generación: 06-12-2021 a las 23:52:14
 -- Versión del servidor: 10.4.20-MariaDB
 -- Versión de PHP: 7.4.21
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `farmacia`
+-- Base de datos: `vehiculo`
 --
 
 DELIMITER $$
@@ -70,6 +70,18 @@ END$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `producto_masvendido` ()  SELECT id_producto, modelo,(SELECT COUNT(*)FROM detalle_venta WHERE vehiculo.id_producto=detalle_venta.id_producto) as cantidad FROM vehiculo WHERE(SELECT COUNT(*) FROM detalle_venta WHERE vehiculo.id_producto=detalle_venta.id_producto)>2 ORDER BY id_producto ASC$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `selecionar_marca` ()  SELECT * from marca$$
+
+--
+-- Funciones
+--
+CREATE DEFINER=`root`@`localhost` FUNCTION `calculariva` (`idproducto` INT) RETURNS DOUBLE BEGIN
+  DECLARE iva double;
+   
+  SELECT format( p.precio_venta*1.13,2) into iva
+  FROM vehiculo as p where p.id_producto =idproducto;
+  RETURN iva;
+ 
+END$$
 
 DELIMITER ;
 
@@ -138,6 +150,7 @@ CREATE TABLE `clientes` (
 
 INSERT INTO `clientes` (`id_cliente`, `nombres`, `apellidos`) VALUES
 (345678923, 'MAURICIO', 'CASTELLANOS'),
+(345678924, 'jorge', 'coto'),
 (425273323, 'ANDREA', 'MARBELLA'),
 (456789323, 'JOSE', 'cruz'),
 (567891234, 'JAVIER', 'LOPEZ');
@@ -167,7 +180,9 @@ INSERT INTO `detalle_venta` (`id_detalle_v`, `id_venta`, `id_producto`, `id_sucu
 (3, 101, 2, 2, '2000.00', 1),
 (4, 102, 3, 2, '30.00', 1),
 (5, 103, 2, 2, '2000.00', 1),
-(6, 104, 2, 1, '2000.00', 1);
+(6, 104, 2, 1, '2000.00', 1),
+(7, 105, 4, 2, '40000.00', 1),
+(8, 106, 2, 5, '2000.00', 1);
 
 -- --------------------------------------------------------
 
@@ -189,11 +204,10 @@ CREATE TABLE `inventarios` (
 
 INSERT INTO `inventarios` (`id_inventario`, `id_vehiculo`, `id_categoria`, `stock`, `estado`) VALUES
 (52, 1, 1, 2, 1),
-(53, 2, 3, 0, 1),
+(53, 2, 3, 2, 1),
 (54, 3, 1, 4, 1),
-(57, 4, 3, 30, 1),
-(58, 5, 6, 34, 1),
-(59, 6, 2, 50, 1);
+(57, 4, 3, 29, 1),
+(58, 5, 6, 34, 1);
 
 --
 -- Disparadores `inventarios`
@@ -225,7 +239,11 @@ INSERT INTO `inventario_total` (`id`, `id_inventario`, `stock_total`) VALUES
 (1, 56, 45),
 (2, 57, 30),
 (3, 58, 34),
-(4, 59, 50);
+(4, 59, 50),
+(5, 60, 45),
+(6, 61, 50),
+(7, 62, 50),
+(8, 63, 40);
 
 -- --------------------------------------------------------
 
@@ -350,10 +368,9 @@ CREATE TABLE `vehiculo` (
 INSERT INTO `vehiculo` (`id_producto`, `descripcion`, `precio_compra`, `precio_venta`, `cilindraje`, `modelo`, `ano`, `imagen`, `id_marca`) VALUES
 (1, 'NISSAN altima 2019', '200.00', '20.00', '4', 'Altima', 2021, 'productos/Automóviles/Altima.jpg', 12),
 (2, ' Autos deportivos', '7000.00', '2000.00', '4', 'MSRP 37OZ', 2021, 'productos/Vehículos deportivos/MSRP 37OZ.jpg', 12),
-(3, 'Dimensiones: 4508 / 1709 / 1410 / 2535 mm', '10.00', '30.00', '4', 'Sentra', 2021, 'productos/Automóviles/Sentra.jpg', 12),
+(3, 'Dimensiones: 4508 / 1709 / 1410 / 2535 mm', '10.00', '30.00', '5', 'Sentra', 2021, 'productos/Automóviles/Sentra.jpg', 12),
 (4, 'Nissan GT-R NISMO 3.8 V6 441 kW (600 CV) (2020)', '20000.00', '40000.00', '5', 'GT-R', 2022, 'productos/Vehículos deportivos/GT-R.jpg', 12),
-(5, 'Doble Cabina Visia 4 Puertas (A?o 2019)', '345000.00', '40200.00', '6', 'NAVARA VISIA', 2020, 'productos/Pick-Up/NAVARA VISIA.jpg', 12),
-(6, 'faros m?s afilados, una parrilla m?s grande y detallada', '50000.00', '57500.00', '7', 'Kicks', 2022, 'productos/Camionetas/Kicks.jpg', 12);
+(5, 'Doble Cabina Visia 4 Puertas (A?o 2019)', '345000.00', '40200.00', '6', 'NAVARA VISIA', 2020, 'productos/Pick-Up/NAVARA VISIA.jpg', 12);
 
 --
 -- Disparadores `vehiculo`
@@ -408,7 +425,11 @@ INSERT INTO `vehiculo_actualizado` (`id_vehuculo_ap`, `anterior_id_producto`, `a
 (9, 1, 'Descripcion', '200.00', '20.00', 12, 'NISSAN Versa 2019', '200.00', '20.00', 12, 'root@localhost', '2021-11-27'),
 (10, 1, 'NISSAN Versa 2019', '200.00', '20.00', 12, 'NISSAN altima 2019', '200.00', '20.00', 12, 'root@localhost', '2021-11-27'),
 (11, 2, 'Descripcion', '1000.00', '2000.00', 12, ' Autos deportivos', '7000.00', '2000.00', 12, 'root@localhost', '2021-11-27'),
-(12, 3, 'Descripcionk', '10.00', '30.00', 12, 'Dimensiones: 4508 / 1709 / 1410 / 2535 mm', '10.00', '30.00', 12, 'root@localhost', '2021-11-27');
+(12, 3, 'Descripcionk', '10.00', '30.00', 12, 'Dimensiones: 4508 / 1709 / 1410 / 2535 mm', '10.00', '30.00', 12, 'root@localhost', '2021-11-27'),
+(13, 6, 'faros m?s afilados, una parrilla m?s grande y detallada', '50000.00', '57500.00', 12, 'faros mas afilados, una parrilla mas grande y detallada', '50000.00', '57500.00', 12, 'root@localhost', '2021-11-27'),
+(14, 3, 'Dimensiones: 4508 / 1709 / 1410 / 2535 mm', '10.00', '30.00', 12, 'Dimensiones: 4508 / 1709 / 1410 / 2535 mm', '10.00', '30.00', 12, 'root@localhost', '2021-11-27'),
+(15, 7, 'dise?o innovador', '2000.00', '4000.00', 12, 'tecnologia de hibridacion', '2000.00', '4000.00', 12, 'root@localhost', '2021-11-27'),
+(16, 7, 'innovaci?n', '20000.00', '250000.00', 12, 'rines anchos', '200.00', '250.00', 12, 'root@localhost', '2021-12-03');
 
 -- --------------------------------------------------------
 
@@ -444,7 +465,12 @@ INSERT INTO `vehiculo_eliminado` (`id`, `id_producto`, `descripcion`, `precio_co
 (7, 3, 'Descripci?n', '200.00', '10.00', 4, 'Modelo', 2021, 12, 'root@localhost', '2021-11-26'),
 (8, 1, 'Nissan GT-R 3.8 V6 419 kW (570 CV) Black Edition (2020)', '10000.00', '15000.00', 4, 'GT-R', 2020, 12, 'root@localhost', '2021-11-26'),
 (9, 5, 'KJP', '10000.00', '50000.00', 5, 'GRT-H', 2020, 12, 'root@localhost', '2021-11-27'),
-(10, 4, 'jkl', '5600.00', '78000.00', 4, 'mlkjh', 2020, 12, 'root@localhost', '2021-11-27');
+(10, 4, 'jkl', '5600.00', '78000.00', 4, 'mlkjh', 2020, 12, 'root@localhost', '2021-11-27'),
+(11, 7, 'tecnologia de hibridacion', '2000.00', '4000.00', 5, 'sentra', 2020, 12, 'root@localhost', '2021-11-27'),
+(12, 7, 'innovacion', '20000.00', '30000.00', 4, 'grt-mnh', 2021, 12, 'root@localhost', '2021-12-03'),
+(13, 7, 'rines anchos', '200.00', '250.00', 5, 'gr-rt', 2021, 12, 'root@localhost', '2021-12-03'),
+(14, 7, 'frontier', '10000.00', '140000.00', 5, 'mk.fg', 2020, 12, 'root@localhost', '2021-12-04'),
+(15, 6, 'faros mas afilados, una parrilla mas grande y detallada', '50000.00', '57500.00', 7, 'Kicks', 2022, 12, 'root@localhost', '2021-12-04');
 
 -- --------------------------------------------------------
 
@@ -471,7 +497,9 @@ INSERT INTO `ventas` (`id_venta`, `fecha_venta`, `total_pago`, `descuento`, `id_
 (101, '2021-11-27', '1960.00', 2, 456789323, 1),
 (102, '2021-11-27', '28.50', 5, 456789323, 1),
 (103, '2021-11-27', '1900.00', 5, 567891234, 1),
-(104, '2021-11-27', '1900.00', 5, 345678923, 1);
+(104, '2021-11-27', '1900.00', 5, 345678923, 1),
+(105, '2021-11-27', '38400.00', 4, 345678923, 1),
+(106, '2021-12-04', '1960.00', 2, 345678924, 1);
 
 --
 -- Índices para tablas volcadas
@@ -590,19 +618,19 @@ ALTER TABLE `clavesanteriores`
 -- AUTO_INCREMENT de la tabla `detalle_venta`
 --
 ALTER TABLE `detalle_venta`
-  MODIFY `id_detalle_v` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_detalle_v` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `inventarios`
 --
 ALTER TABLE `inventarios`
-  MODIFY `id_inventario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
+  MODIFY `id_inventario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT de la tabla `inventario_total`
 --
 ALTER TABLE `inventario_total`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `limite_productos`
@@ -632,19 +660,19 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `vehiculo_actualizado`
 --
 ALTER TABLE `vehiculo_actualizado`
-  MODIFY `id_vehuculo_ap` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id_vehuculo_ap` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de la tabla `vehiculo_eliminado`
 --
 ALTER TABLE `vehiculo_eliminado`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT de la tabla `ventas`
 --
 ALTER TABLE `ventas`
-  MODIFY `id_venta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
+  MODIFY `id_venta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=107;
 
 --
 -- Restricciones para tablas volcadas
