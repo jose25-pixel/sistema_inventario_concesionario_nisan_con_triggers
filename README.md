@@ -1,6 +1,6 @@
 # Sistema web para el control de concecionario de vehiculos y venta (Local)
 <p>Proyecto para tener un mejor control del inventario y venta de vehiculos</p>
-<img src="https://github.com/Jose-developer-start/sistema_farmacia/blob/main/ScreenSistema/Farmacia_Screen.jpg" width="500px">
+<img src="https://github.com/Jose-developer-start/sistema_farmacia/blob/main/ScreenSistema/Screenshot_1.png" width="500px">
 
 ## Comenzando 🚀
 ### Requisitos 📋
