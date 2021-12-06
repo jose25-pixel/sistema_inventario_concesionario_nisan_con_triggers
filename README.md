@@ -5,15 +5,17 @@
 ## Comenzando 🚀
 ### Requisitos 📋
 Tener instalado XAMPP(Window) O LAMPP(GNU/Linux)
-Lenguaje de programación PHP v7.2 y JS superior
+Lenguaje de programación PHP v7.2 y JS 
 
 
 
 ### Tecnologias 🔩
 
 
-<p>La base de datos contiene procedimientos almacenados, triggers y funciones  que son llamados en el  codigo fuente</p>
+
 <p>PHP,JS y MySQL</p>
+<p>La base de datos contiene procedimientos almacenados, triggers y funciones  que son llamados en el  codigo </p>
+<p>recuerda borar la cache del  navegador</p>
 
 <br>
 <h2>Base de datos II</h2>
